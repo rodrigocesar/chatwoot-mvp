@@ -179,9 +179,10 @@ One row per customer; tracks Chatwoot and WhatsApp provisioning.
 
 ## Seed Data (Demo)
 
-Two customers for tenant isolation test:
+Per constitution and tasks (T040 Slice 1, T054 Slice 2):
 
-1. **Clínica Exemplo** (BR) — primary demo journey with agents Maria Silva, João Souza.
-2. **Tech Solutions Ltd** (US) — secondary tenant with distinct `chatwootAccountId`.
+1. **Clínica Exemplo** (BR) — primary demo journey; seeded Slice 1.
+2. **Escritório Contábil Alfa** (BR) — secondary tenant for tenant isolation; seeded Slice 2.
+3. **Loja Boa Luz** (BR) — third tenant with distinct `chatwootAccountId`; seeded Slice 2.
 
-Seed script optional; quickstart documents manual creation steps.
+Agents Maria Silva and João Souza are demo examples for Slice 2+ agent linking. Quickstart documents manual creation when seed is not run.

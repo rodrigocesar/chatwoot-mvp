@@ -34,4 +34,6 @@
 - Validation passed on first iteration (2026-06-10).
 - Chatwoot is referenced as the named external omnichannel product (business context), not as implementation stack detail.
 - Strategic open questions are captured under Investigation Deliverables and Assumptions rather than blocking clarifications.
-- Spec is ready for `/speckit-plan`.
+- Clarification session 2026-06-10: implementation slices 1–4 added.
+- Remediation 2026-06-10: plan §9, quickstart, and tasks aligned to 4-slice model; Slice 1 tests (T041–T043) gate MVP sign-off.
+- Spec is ready for `/speckit-implement` starting Slice 1 (T001–T043).

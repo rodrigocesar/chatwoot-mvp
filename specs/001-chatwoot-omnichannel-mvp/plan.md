@@ -10,6 +10,8 @@ Build a **local-first Moonu Simulator** — a standalone TypeScript web applicat
 
 **Research**: [research.md](./research.md) — Option A selected; Platform API for workspace/user provisioning; WhatsApp inbox manual in v1.
 
+**Delivery**: Four implementation slices ([spec.md](./spec.md#implementation-slices)); MVP = Slice 1 only (tasks T001–T043).
+
 ---
 
 ## Technical Context
@@ -279,61 +281,59 @@ See [quickstart.md](./quickstart.md) for validation scenarios.
 
 ## 9. Implementation Phases
 
-### Phase 1 — Scaffold & Core CRUD (P1 foundation)
+> **Authoritative delivery model**: Four slices defined in [spec.md](./spec.md#implementation-slices).
+> Task breakdown: [tasks.md](./tasks.md). This section maps slices to plan architecture.
 
-- Initialize Next.js + Prisma + PostgreSQL + Docker Compose (`moonu-db`)
-- Prisma schema for all entities
-- Customer list/detail/create API + UI
-- Phone numbers and extensions API + telephony UI
-- `.env.example`, README pointer to quickstart
+### Slice 1 — Local Visible Demo (MVP checkpoint)
 
-**Exit**: Create "Clínica Exemplo" with telephony data.
+- Next.js + Prisma + PostgreSQL + Docker Compose (`moonu-db` only)
+- Customer list/detail, telephony (phone numbers + extensions)
+- `ChatwootAdapter` interface + `MockChatwootAdapter` + factory (`CHATWOOT_MODE=mock`)
+- Omnichannel enable, mock workspace status, mocked WhatsApp checklist (GET only)
+- Open Chatwoot button (mock dashboard URL), connection status page
+- Seed: **Clínica Exemplo** only
+- Core tests: mock adapter unit + Slice 1 integration (constitution Principle XII)
 
-### Phase 2 — Chatwoot Adapter (mock first)
+**Out of scope**: Real Chatwoot, agents UI, manual ID linking, tenant isolation demo, API automation.
 
-- `ChatwootAdapter` interface + `MockChatwootAdapter`
-- `getChatwootAdapter()` factory
-- Omnichannel enable service + API
-- Omnichannel dashboard UI (status cards, mock URL)
-- `docs/chatwoot-operations.md` — automated/manual matrix
+**Exit**: SC-001 — one customer, mock omnichannel, no external services. Tasks **T001–T043**.
 
-**Exit**: Enable omnichannel in mock mode; dashboard shows connected workspace.
+### Slice 2 — Real Chatwoot Runtime
 
-### Phase 3 — Agents & Open Inbox
+- Chatwoot compose profile; `CHATWOOT_BASE_URL` in env
+- `RealUrlChatwootAdapter` — real URLs from manually stored account/user IDs (no Platform API yet)
+- Manual account/user creation in Chatwoot UI + link forms in simulator
+- Agent management UI with manual `chatwootUserId` link
+- Tenant isolation: **two+ customers** with distinct linked account IDs (Escritório Contábil Alfa, Loja Boa Luz seeded)
+- Tenant isolation integration test (`tests/integration/tenant-isolation.test.ts`) — **T075**, gates Slice 2 exit (SC-006)
+- Unreachable Chatwoot handling on status UI
 
-- Agent CRUD + mock sync
-- Agent management UI with sync badges
-- `GET .../omnichannel/open` redirect flow
-- Connection status screen
+**Exit**: SC-002 + SC-006. Tasks **T044–T057, T075**.
 
-**Exit**: Primary user journey complete in mock mode.
+### Slice 3 — API Automation Research
 
-### Phase 4 — WhatsApp Checklist
+- Spike Platform API; document in `docs/decisions/0001-chatwoot-platform-api.md`
+- `PlatformApiChatwootAdapter` — replace mock/manual ops incrementally
+- `docs/chatwoot-operations.md` automated/manual/unknown matrix
+- Retry provisioning endpoint; agent sync via API when verified, manual fallback retained
 
-- Checklist JSON init on enable
-- WhatsApp setup screen with six steps + manual PATCH API
-- Aggregate `whatsappSetupStatus` derivation from checklist
+**Exit**: SC-005 + ≥1 API-driven operation with fallback. Tasks **T058–T066**.
 
-**Exit**: Full demo without WhatsApp credentials.
+### Slice 4 — WhatsApp Setup Flow
 
-### Phase 5 — Real Chatwoot Adapter
+- Embedded Signup vs manual decision doc
+- Checklist PATCH API, PT-BR guidance copy, optional inbox detection
+- One real WhatsApp Cloud API number trial + blocker doc
 
-- `PlatformApiChatwootAdapter` implementation
-- Health check + unreachable handling
-- Compose profile for Chatwoot
-- Manual test script for Platform API
-- Update `docs/chatwoot-investigation.md` with tenant isolation findings
+**Exit**: Documented real setup attempt. Tasks **T067–T072**.
 
-**Exit**: Two customers with real workspace IDs (when Chatwoot running).
+### Cross-cutting — Polish & quality gates
 
-### Phase 6 — Polish & Demo Readiness
+- Extend tests for edge cases
+- `docs/production-gaps.md`, operational README notes, quickstart validation
+- Tasks **T073–T080**
 
-- Seed script for two tenants (optional)
-- E2E test for mock journey
-- UI polish: loading states, error toasts, mock mode banner
-- Final quickstart validation
-
-**Exit**: All spec acceptance criteria met; SC-001 15-minute developer path verified.
+**Note**: Adapter evolution is **mock → real-url → platform-api** (three implementations, one interface).
 
 ---
 

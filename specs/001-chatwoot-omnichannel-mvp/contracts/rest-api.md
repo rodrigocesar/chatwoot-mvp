@@ -112,7 +112,7 @@ Update `companyName`, `country`, `subscriptionStatus`.
 
 ### `POST /customers/:customerId/omnichannel/enable`
 
-Enables omnichannel, creates/links Chatwoot workspace via adapter, upserts `OmnichannelSetup`.
+Enables omnichannel and upserts `OmnichannelSetup`. In `mock` mode, assigns a mock account ID via adapter. In `real` mode (Slice 2+), workspace may remain unlinked until `PATCH .../omnichannel/link` or Platform API provisioning (Slice 3).
 
 **Response 200**
 
@@ -147,6 +147,40 @@ Returns omnichannel dashboard payload: setup record, checklist, agent sync summa
   "connectionHealth": { "chatwootReachable": true, "mode": "mock" }
 }
 ```
+
+### `PATCH /customers/:customerId/omnichannel/link`
+
+Manually links an existing Chatwoot account ID to a customer after omnichannel is enabled. Used in **Slice 2** when accounts are created in the Chatwoot UI and IDs are entered in the simulator (`CHATWOOT_MODE=real`, `RealUrlChatwootAdapter`). Does not call Platform API.
+
+**Preconditions**
+
+- Customer exists and `omnichannelEnabled` is `true`
+- `CHATWOOT_MODE` is `real` (returns **409** in `mock` mode)
+
+**Body**
+
+```json
+{
+  "chatwootAccountId": "42"
+}
+```
+
+**Response 200**
+
+```json
+{
+  "customerId": "uuid",
+  "chatwootAccountId": "42",
+  "chatwootAccountStatus": "connected",
+  "setupMode": "manual",
+  "chatwootDashboardUrl": "http://localhost:3001/app/accounts/42/dashboard"
+}
+```
+
+**Response 400**: Missing or invalid `chatwootAccountId` (non-numeric string).  
+**Response 404**: Customer not found.  
+**Response 409**: Omnichannel not enabled, or mode is `mock`.  
+**Response 422**: Customer already linked to a different `chatwootAccountId` (idempotent re-link with same ID returns 200).
 
 ### `POST /customers/:customerId/omnichannel/retry`
 
