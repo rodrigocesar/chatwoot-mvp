@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  active
+  trial
+  inactive
+  suspended
+}
+
+enum PhoneNumberStatus {
+  active
+  inactive
+  pending
+}
+
+enum ExtensionStatus {
+  active
+  inactive
+}
+
+enum AgentRole {
+  admin
+  agent
+}
+
+enum AgentStatus {
+  pending
+  synced
+  failed
+  conflict
+}
+
+enum SetupStatus {
+  not_started
+  manual_setup_required
+  pending
+  connected
+  failed
+}
+
+enum SetupMode {
+  automated
+  mock
+  manual
+}
+
+model Customer {
+  id                 String             @id @default(uuid())
+  companyName        String
+  country            String
+  subscriptionStatus SubscriptionStatus
+  omnichannelEnabled Boolean            @default(false)
+  chatwootAccountId  String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  phoneNumbers     PhoneNumber[]
+  extensions       Extension[]
+  agents           Agent[]
+  omnichannelSetup OmnichannelSetup?
+
+  @@map("customers")
+}
+
+model PhoneNumber {
+  id         String            @id @default(uuid())
+  customerId String
+  e164Number String
+  label      String
+  status     PhoneNumberStatus
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, e164Number])
+  @@map("phone_numbers")
+}
+
+model Extension {
+  id               String          @id @default(uuid())
+  customerId       String
+  extensionNumber  String
+  displayName      String
+  assignedUserName String?
+  status           ExtensionStatus
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, extensionNumber])
+  @@map("extensions")
+}
+
+model Agent {
+  id             String      @id @default(uuid())
+  customerId     String
+  name           String
+  email          String
+  role           AgentRole
+  chatwootUserId String?
+  status         AgentStatus @default(pending)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, email])
+  @@map("agents")
+}
+
+model OmnichannelSetup {
+  id                    String      @id @default(uuid())
+  customerId            String      @unique
+  chatwootAccountStatus SetupStatus @default(not_started)
+  whatsappSetupStatus   SetupStatus @default(not_started)
+  whatsappPhoneNumber   String?
+  chatwootInboxId       String?
+  setupMode             SetupMode   @default(mock)
+  notes                 String?
+  checklistJson         Json
+  lastSyncedAt          DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("omnichannel_setups")
+}
