@@ -1,0 +1,43 @@
+---
+alwaysApply: true
+---
+
+# Moonu Chatwoot MVP Rules
+
+This project evaluates Chatwoot as a white-label or embedded omnichannel layer on a
+Moonu-like PBX platform. See `.specify/memory/constitution.md` v1.1.0.
+
+Do not modify Chatwoot source code unless a task or decision record explicitly authorizes it.
+
+Treat Chatwoot as an external self-hosted service. All Chatwoot access goes through the adapter.
+
+**Adapter-first** for all external systems: Chatwoot, Meta/WhatsApp (future), telephony APIs,
+billing providers. No direct vendor API calls outside adapter packages.
+
+**Moonu Simulator owns**: customers, subscriptions, simulated phone numbers, simulated PBX
+extensions, billing status (simulated), Chatwoot mappings, omnichannel activation state.
+
+**Chatwoot owns**: conversations, inboxes, contacts, agent conversation handling, WhatsApp
+workflows, omnichannel support UI.
+
+Prefer small, demoable vertical slices. Every feature must validate the omnichannel hypothesis.
+
+When external API behavior is unknown: mock first, mark manual/research, write TODO—never
+invent behavior. Spikes must end with: works / does not work / unknown / requires credentials.
+
+**Demo seed customers** (required): Clínica Exemplo, Escritório Contábil Alfa, Loja Boa Luz.
+
+**UI status labels** must distinguish: automated, manual_setup_required, mocked,
+not_implemented, failed, connected.
+
+**Locale**: Brazilian SMB / WhatsApp-heavy examples in product copy; English-first codebase.
+
+No secrets in code. No real WhatsApp credentials required for local demo. No real PBX/SIP.
+
+Every feature must have:
+- user-facing behavior
+- data model impact
+- acceptance criteria
+- basic test coverage (core domain + adapter + tenant isolation)
+
+Definition of Done: see constitution. Update docs/decisions/ for architectural choices.

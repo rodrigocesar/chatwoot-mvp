@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Next.js / build
+.next/
+out/
+dist/
+build/
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Logs and debug
+*.log
+npm-debug.log*
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Test / coverage
+coverage/
+
+# Docker local overrides
+docker-compose.override.yml
+
+# Cursor IDE — never commit agent-local state (credentials, transcripts, MCP cache)
+.cursor/*
+!.cursor/rules/
+!.cursor/skills/
