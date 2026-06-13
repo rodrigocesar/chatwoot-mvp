@@ -46,7 +46,7 @@ Delivery MUST follow these slices in order. Later slices MUST NOT block completi
 **In scope**:
 
 - Run Chatwoot locally or on a VM; `CHATWOOT_BASE_URL` via environment configuration
-- Chatwoot adapter interface introduced (real URL generation; provisioning still manual)
+- `RealUrlChatwootAdapter` for real workspace URL generation from manually stored IDs (provisioning still manual in Chatwoot UI)
 - Administrator manually creates account and user in Chatwoot UI
 - Moonu Simulator stores and displays linked Chatwoot account/user IDs per customer
 - **Open Chatwoot** opens the correct real workspace URL for the linked account

@@ -38,7 +38,7 @@ Build a **local-first Moonu Simulator** — a standalone TypeScript web applicat
 - No real WhatsApp credentials required for first demo
 - Prefer mock Chatwoot mode until Platform API verified against running instance
 
-**Scale/Scope**: ~7 screens, 5 domain entities, 2 demo tenants, single admin persona
+**Scale/Scope**: ~7 screens, 5 domain entities, 3 seed customers (1 Slice 1, +2 Slice 2), single admin persona
 
 ---
 
@@ -147,7 +147,7 @@ Full contract: [contracts/rest-api.md](./contracts/rest-api.md)
 | Customers | `GET/POST /customers`, `GET/PATCH /customers/:id` |
 | Phone numbers | CRUD under `/customers/:id/phone-numbers` |
 | Extensions | CRUD under `/customers/:id/extensions` |
-| Omnichannel | `POST .../enable`, `GET .../omnichannel`, `POST .../retry`, `GET .../open` |
+| Omnichannel | `POST .../enable`, `GET .../omnichannel`, `PATCH .../link` (Slice 2 manual account ID), `POST .../retry` (Slice 3+), `GET .../open` |
 | Agents | `GET/POST /customers/:id/agents`, `POST .../retry`, `DELETE` |
 | WhatsApp | `GET/PATCH .../whatsapp-checklist` |
 | Health | `GET /health` |
@@ -161,7 +161,7 @@ Full contract: [contracts/rest-api.md](./contracts/rest-api.md)
 | 1 | Customer list | `/customers` | List, search, create customer |
 | 2 | Customer detail | `/customers/[id]` | Overview, subscription badge, nav to sub-sections |
 | 3 | Phone numbers & extensions | `/customers/[id]/telephony` | Tabs: numbers + extensions CRUD |
-| 4 | Omnichannel setup | `/customers/[id]/omnichannel` | Enable add-on, retry, setup mode indicator |
+| 4 | Omnichannel setup | `/customers/[id]/omnichannel` | Enable add-on, manual account ID link (S2), retry (S3+), setup mode indicator |
 | 5 | Agent management | `/customers/[id]/agents` | Add agents, sync status, retry |
 | 6 | Chatwoot connection status | `/customers/[id]/omnichannel/status` | Workspace health, adapter mode, last sync |
 | 7 | WhatsApp setup checklist | `/customers/[id]/omnichannel/whatsapp` | Six steps, manual guidance, status badges |
@@ -180,8 +180,9 @@ Full contract: [contracts/chatwoot-adapter.md](./contracts/chatwoot-adapter.md)
 
 ```text
 ChatwootAdapter (interface)
-├── MockChatwootAdapter     ← default; CHATWOOT_MODE=mock
-└── PlatformApiChatwootAdapter ← CHATWOOT_MODE=real
+├── MockChatwootAdapter          ← CHATWOOT_MODE=mock (default)
+├── RealUrlChatwootAdapter       ← CHATWOOT_MODE=real, no platform token (Slice 2)
+└── PlatformApiChatwootAdapter   ← CHATWOOT_MODE=real + CHATWOOT_PLATFORM_API_TOKEN (Slice 3+)
 ```
 
 **Factory**: `getChatwootAdapter()` reads env at request time (testable via DI).
